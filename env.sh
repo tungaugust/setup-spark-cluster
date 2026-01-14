@@ -321,7 +321,6 @@ ensure_bin() {
     printf "[INFO] Run 'source %s' to apply changes\n\n" "$rc"
 }
 
-
 ensure_managed_block() {
     local rc="$1"
     local begin="$2"
@@ -329,32 +328,23 @@ ensure_managed_block() {
     shift 3
     [ "$#" -gt 0 ] || return 0
 
-    # Create the block content in a variable
     local block_content
-    block_content=$(printf "
-%s
+    block_content=$(cat <<EOF
+$begin
+$(printf '%s\n' "$@")
+$end
+EOF
+)
 
-" "$begin")
-    for line in "$@"; do
-        block_content+=$(printf "%s
-" "$line")
-    done
-    block_content+=$(printf "
-%s
-" "$end")
-
-    # If file is not writable, we might need sudo but we must preserve ownership
     if [[ ! -w "$rc" ]]; then
-        # Use sudo to remove old block and append new one, then fix ownership
         sudo sed -i "\|$begin|,\|$end|d" "$rc" 2>/dev/null || true
-        echo "$block_content" | sudo tee -a "$rc" > /dev/null
+        printf '%s\n' "$block_content" | sudo tee -a "$rc" > /dev/null
         sudo chown "$USER:$USER" "$rc"
     else
         sed -i "\|$begin|,\|$end|d" "$rc" 2>/dev/null || true
-        echo "$block_content" >> "$rc"
+        printf '%s\n' "$block_content" >> "$rc"
     fi
 }
-
 
 resolve_rc() {
     case "$RC_TARGET" in
