@@ -427,9 +427,9 @@ setup_ssh_and_hostname() {
     local block_end="# <<< Cluster IP List"
 
     # Comment out 127.0.1.1 entry for this hostname
-    if grep -qE "^[[:space:]]*127\.0\.1\.1[[:space:]]+$new_hostname" "$hosts_file"; then
+    if grep -Eq "^[[:space:]]*127\.0\.1\.1[[:space:]]+.*\b${new_hostname}\b" "$hosts_file"; then
         sudo sed -i -E \
-            "s|^[[:space:]]*127\.0\.1\.1[[:space:]]+$new_hostname|# 127.0.1.1 $new_hostname|" \
+            "s|^[[:space:]]*127\.0\.1\.1([[:space:]]+.*\b${new_hostname}\b.*)|# 127.0.1.1\1|" \
             "$hosts_file"
     fi
 
