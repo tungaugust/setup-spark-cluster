@@ -173,7 +173,6 @@ smart_download() {
 }
 
 
-
 require_sudo() {
     sudo -v || {
         echo "[ERROR] sudo required"
