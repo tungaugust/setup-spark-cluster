@@ -182,8 +182,15 @@ main() {
             '-w'|'--workers')
                 UPDATE_WORKERS=true
                 shift
-                WORKERS_LIST=()
-                while [[ $# -gt 0 && ! "$1" =~ ^- ]]; do WORKERS_LIST+=("$1"); shift; done
+                if [[ $# -eq 0 || "$1" =~ ^- ]]; then
+                    WORKERS_LIST=("${WORKERS[@]}")
+                else
+                    WORKERS_LIST=()
+                    while [[ $# -gt 0 && ! "$1" =~ ^- ]]; do
+                        WORKERS_LIST+=("$1")
+                        shift
+                    done
+                fi                
                 ;;
             '-c'|'--config')
                 SEND_CONFIG=true
